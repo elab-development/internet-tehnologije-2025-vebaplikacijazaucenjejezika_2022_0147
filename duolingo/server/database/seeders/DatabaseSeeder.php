@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             CourseSeeder::class,
             LessonSeeder::class,
             EnrollmentSeeder::class,
+            LanguageSeeder::class,
         ]);
     }
 }

@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\EnrollmentController;
+use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\TranslateController;
 use Illuminate\Http\Request;
@@ -25,24 +26,29 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::get('/courses', [CourseController::class, 'index']);
 Route::get('/courses/{course}', [CourseController::class, 'show']);
 
-Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
-    return $request->user();
-});
+Route::get('/languages', [LanguageController::class, 'index']);
+Route::get('/languages/{language}', [LanguageController::class, 'show']);
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/logout', [AuthController::class, 'logout']);
+    Route::get('/me', [AuthController::class, 'me']);
 
     Route::resource('courses', CourseController::class)
         ->only(['store', 'update', 'destroy']);
 
     Route::get('/teacher/{id}/courses', [CourseController::class, 'teacherCourses']);
 
-    Route::resource('/lessons', LessonController::class);
+    Route::resource('lessons', LessonController::class)
+        ->only(['index', 'show', 'store', 'update', 'destroy']);
 
-    Route::resource('/enrollments', EnrollmentController::class)
+    Route::resource('enrollments', EnrollmentController::class)
         ->only(['index', 'store', 'update']);
 
     Route::get('/student/{id}/enrollments', [EnrollmentController::class, 'studentEnrollments']);
+
+    Route::resource('languages', LanguageController::class)
+        ->only(['store', 'update', 'destroy']);
+
 
     Route::get('/translate', [TranslateController::class, 'translate']);
 });

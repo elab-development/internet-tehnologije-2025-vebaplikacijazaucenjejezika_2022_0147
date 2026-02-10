@@ -52,16 +52,19 @@ class AuthController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json($validator->errors());
+            return response()->json($validator->errors(), 422);
         }
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => Hash::make($request->password)
+            'password' => Hash::make($request->password),
+            // ako želiš default role:
+            // 'role' => 'student',
         ]);
 
         $token = $user->createToken('auth_token')->plainTextToken;
+
         return response()->json([
             'data' => $user,
             'access_token' => $token,
@@ -113,6 +116,43 @@ class AuthController extends Controller
             'message' => $user->name . ' logged in',
             'access_token' => $token,
             'token_type' => 'Bearer'
+        ]);
+    }
+
+    /**
+     * @OA\Get(
+     *   path="/api/me",
+     *   tags={"Auth"},
+     *   summary="Get currently authenticated user",
+     *   security={{"bearerAuth":{}}},
+     *   @OA\Response(
+     *     response=200,
+     *     description="OK",
+     *     @OA\JsonContent(
+     *       type="object",
+     *       @OA\Property(
+     *         property="data", type="object",
+     *         @OA\Property(property="id", type="integer", example=1),
+     *         @OA\Property(property="name", type="string", example="Stefan"),
+     *         @OA\Property(property="email", type="string", example="stefan@mail"),
+     *         @OA\Property(property="role", type="string", example="student")
+     *       )
+     *     )
+     *   ),
+     *   @OA\Response(response=401, description="Unauthorized")
+     * )
+     */
+    public function me(Request $request)
+    {
+        // radi i bez Request parametra: return response()->json(['data' => auth()->user()]);
+        $user = $request->user();
+
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        return response()->json([
+            'data' => $user,
         ]);
     }
 

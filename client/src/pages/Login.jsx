@@ -14,6 +14,7 @@ export default function Login() {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [submitted, setSubmitted] = useState(false);
 
   const clientError = useMemo(() => {
     if (!email.trim()) return 'Email is required.';
@@ -23,8 +24,11 @@ export default function Login() {
     return null;
   }, [email, password]);
 
+  const showClientError = submitted ? clientError : null;
+
   const onSubmit = async (e) => {
     e.preventDefault();
+    setSubmitted(true);
     clearError();
 
     if (clientError) return;
@@ -58,11 +62,11 @@ export default function Login() {
         </div>
 
         {/* Error */}
-        {(error || clientError) && (
+        {(error || showClientError) && (
           <div className='mb-4 rounded-2xl border border-red-200 bg-red-50 p-3 text-sm text-red-700'>
             <div className='flex gap-2'>
               <AlertTriangle className='h-4 w-4 mt-0.5' />
-              <span className='font-semibold'>{error || clientError}</span>
+              <span className='font-semibold'>{error || showClientError}</span>
             </div>
           </div>
         )}
@@ -95,7 +99,7 @@ export default function Login() {
 
           <button
             type='submit'
-            disabled={loading || clientError}
+            disabled={loading}
             className='w-full flex items-center justify-center gap-2 rounded-2xl bg-green-600 px-4 py-3 text-sm font-extrabold text-white shadow-sm hover:bg-green-700 disabled:opacity-50'
           >
             {loading ? (
@@ -114,7 +118,7 @@ export default function Login() {
 
         {/* Footer */}
         <div className='mt-6 text-center text-sm text-gray-600'>
-          Don't have an account?{' '}
+          Don&apos;t have an account?{' '}
           <Link
             to='/register'
             className='font-extrabold text-green-700 hover:underline'

@@ -1,12 +1,12 @@
 <?php
 
+use App\Http\Controllers\AdminStatsController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\EnrollmentController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\TranslateController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -49,6 +49,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::resource('languages', LanguageController::class)
         ->only(['store', 'update', 'destroy']);
 
+    Route::get('/admin/stats', [AdminStatsController::class, 'stats']);
 
     Route::get('/translate', [TranslateController::class, 'translate']);
 });

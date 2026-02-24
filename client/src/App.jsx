@@ -11,6 +11,7 @@ import Register from './pages/Register';
 import Profile from './pages/Profile';
 import CourseDetails from './pages/CourseDetails';
 import LessonDetails from './pages/LessonDetails';
+import Translate from './pages/Translate';
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
             <Route path='/profile' element={<Profile />} />
             <Route path='/course/:courseId' element={<CourseDetails />} />
             <Route path='/lesson/:lessonId' element={<LessonDetails />} />
+            <Route path='/translate' element={<Translate />} />
           </Route>
         </Route>
       </Routes>

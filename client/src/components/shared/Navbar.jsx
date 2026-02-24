@@ -1,6 +1,15 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Home, LogIn, UserPlus, User, LogOut, Menu, X } from 'lucide-react';
+import {
+  Home,
+  LogIn,
+  UserPlus,
+  User,
+  LogOut,
+  Menu,
+  X,
+  Languages,
+} from 'lucide-react';
 import { useAuthStore } from '../../stores/useAuthStore';
 import { NavItem } from './NavItem';
 
@@ -24,6 +33,7 @@ export default function Navbar() {
     if (user) {
       return [
         { to: '/', label: 'Home', icon: Home },
+        { to: '/translate', label: 'Translate', icon: Languages },
         { to: '/profile', label: 'Profile', icon: User },
       ];
     }

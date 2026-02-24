@@ -3,7 +3,7 @@ import Navbar from '../components/shared/Navbar';
 
 export default function AppLayout() {
   return (
-    <div className='min-h-screen bg-gradient-to-b from-green-50 to-white'>
+    <div className='min-h-screen bg-linear-to-b from-green-50 to-white'>
       <Navbar />
 
       <main className='mx-auto w-full max-w-6xl px-4 py-6'>

@@ -8,6 +8,7 @@ import { useCourseStore } from '../stores/useCourseStore';
 import ProfileHeader from '../components/profile/ProfileHeader';
 import StudentCoursesTable from '../components/profile/StudentCoursesTable';
 import TeacherCoursesTable from '../components/profile/TeacherCoursesTable';
+import AdminOverview from '../components/profile/AdminOverview';
 
 export default function Profile() {
   const user = useAuthStore((s) => s.user);
@@ -60,6 +61,9 @@ export default function Profile() {
       {user.role === 'teacher' && !loading && (
         <TeacherCoursesTable courses={teacherCourses} />
       )}
+
+      {/* ADMIN */}
+      {user.role === 'admin' && <AdminOverview />}
     </div>
   );
 }

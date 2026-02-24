@@ -6,6 +6,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 
+/**
+ * @OA\Tag(
+ *   name="Translate",
+ *   description="Translation endpoints (MyMemory provider)"
+ * )
+ */
 class TranslateController extends Controller
 {
     /**
@@ -14,7 +20,7 @@ class TranslateController extends Controller
      *   tags={"Translate"},
      *   summary="Translate a sentence from a source language to a target language",
      *   description="Uses the public MyMemory API. Accepts language names (e.g., 'German') or ISO-2 codes (e.g., 'de').",
-     *   security={{"bearerAuth":{}}},
+     *   security={{"sanctum":{}}},
      *   @OA\Parameter(
      *     name="q", in="query", required=true, description="Text to translate (max 2000 chars)",
      *     @OA\Schema(type="string", maxLength=2000), example="Hello, how are you?"

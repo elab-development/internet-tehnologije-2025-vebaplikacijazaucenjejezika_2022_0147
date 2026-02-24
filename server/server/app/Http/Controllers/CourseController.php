@@ -17,6 +17,26 @@ use Illuminate\Validation\Rule;
  */
 class CourseController extends Controller
 {
+    /**
+     * @OA\Get(
+     *   path="/api/courses",
+     *   tags={"Courses"},
+     *   summary="List all courses (public)",
+     *   @OA\Response(
+     *     response=200,
+     *     description="OK",
+     *     @OA\JsonContent(
+     *       type="object",
+     *       @OA\Property(
+     *         property="courses",
+     *         type="array",
+     *         @OA\Items(ref="#/components/schemas/Course")
+     *       )
+     *     )
+     *   ),
+     *   @OA\Response(response=404, description="No courses found.")
+     * )
+     */
     public function index()
     {
         $courses = Course::query()
@@ -34,6 +54,69 @@ class CourseController extends Controller
         ]);
     }
 
+    /**
+     * @OA\Get(
+     *   path="/api/courses/{course}",
+     *   tags={"Courses"},
+     *   summary="Get a single course (public)",
+     *   @OA\Parameter(
+     *     name="course", in="path", required=true, description="Course ID",
+     *     @OA\Schema(type="integer")
+     *   ),
+     *   @OA\Response(
+     *     response=200,
+     *     description="OK",
+     *     @OA\JsonContent(
+     *       type="object",
+     *       @OA\Property(property="course", ref="#/components/schemas/Course")
+     *     )
+     *   ),
+     *   @OA\Response(response=404, description="Not found")
+     * )
+     */
+    public function show(Course $course)
+    {
+        $course->load(['language:id,name,img_url']);
+
+        return response()->json([
+            'course' => new CourseResource($course),
+        ]);
+    }
+
+    /**
+     * @OA\Get(
+     *   path="/api/teacher/{id}/courses",
+     *   tags={"Courses"},
+     *   summary="Get courses by teacher (admin can fetch any teacher; teacher can fetch own)",
+     *   security={{"sanctum":{}}},
+     *   @OA\Parameter(
+     *     name="id", in="path", required=true, description="Teacher user ID",
+     *     @OA\Schema(type="integer")
+     *   ),
+     *   @OA\Response(
+     *     response=200,
+     *     description="OK",
+     *     @OA\JsonContent(
+     *       type="object",
+     *       @OA\Property(
+     *         property="teacher",
+     *         type="object",
+     *         @OA\Property(property="id", type="integer", example=7),
+     *         @OA\Property(property="name", type="string", example="Stefan"),
+     *         @OA\Property(property="email", type="string", example="stefan@mail.com")
+     *       ),
+     *       @OA\Property(
+     *         property="courses",
+     *         type="array",
+     *         @OA\Items(ref="#/components/schemas/Course")
+     *       )
+     *     )
+     *   ),
+     *   @OA\Response(response=401, description="Unauthorized"),
+     *   @OA\Response(response=403, description="Forbidden"),
+     *   @OA\Response(response=404, description="Teacher not found")
+     * )
+     */
     public function teacherCourses($id)
     {
         if (!Auth::check()) {
@@ -82,6 +165,37 @@ class CourseController extends Controller
         ]);
     }
 
+    /**
+     * @OA\Post(
+     *   path="/api/courses",
+     *   tags={"Courses"},
+     *   summary="Create a course (admin only)",
+     *   security={{"sanctum":{}}},
+     *   @OA\RequestBody(
+     *     required=true,
+     *     @OA\JsonContent(
+     *       required={"title","language_id","level"},
+     *       @OA\Property(property="title", type="string", example="German B1 – Conversation"),
+     *       @OA\Property(property="language_id", type="integer", example=1),
+     *       @OA\Property(property="level", type="string", enum={"A1","A2","B1","B2","C1","C2"}, example="B1"),
+     *       @OA\Property(property="teacher_id", type="integer", nullable=true, example=7),
+     *       @OA\Property(property="is_active", type="boolean", example=true)
+     *     )
+     *   ),
+     *   @OA\Response(
+     *     response=200,
+     *     description="Created",
+     *     @OA\JsonContent(
+     *       type="object",
+     *       @OA\Property(property="message", type="string", example="Course created successfully"),
+     *       @OA\Property(property="course", ref="#/components/schemas/Course")
+     *     )
+     *   ),
+     *   @OA\Response(response=401, description="Unauthorized"),
+     *   @OA\Response(response=403, description="Only admins can create courses"),
+     *   @OA\Response(response=422, description="Validation error")
+     * )
+     */
     public function store(Request $request)
     {
         if (!Auth::check()) {
@@ -111,15 +225,37 @@ class CourseController extends Controller
         ]);
     }
 
-    public function show(Course $course)
-    {
-        $course->load(['language:id,name,img_url']);
-
-        return response()->json([
-            'course' => new CourseResource($course),
-        ]);
-    }
-
+    /**
+     * @OA\Put(
+     *   path="/api/courses/{course}",
+     *   tags={"Courses"},
+     *   summary="Update a course (admin only)",
+     *   security={{"sanctum":{}}},
+     *   @OA\Parameter(name="course", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\RequestBody(
+     *     required=false,
+     *     @OA\JsonContent(
+     *       @OA\Property(property="title", type="string", example="German B1 – Conversation (Updated)"),
+     *       @OA\Property(property="language_id", type="integer", example=1),
+     *       @OA\Property(property="level", type="string", enum={"A1","A2","B1","B2","C1","C2"}, example="B1"),
+     *       @OA\Property(property="teacher_id", type="integer", nullable=true, example=7),
+     *       @OA\Property(property="is_active", type="boolean", example=true)
+     *     )
+     *   ),
+     *   @OA\Response(
+     *     response=200,
+     *     description="Updated",
+     *     @OA\JsonContent(
+     *       type="object",
+     *       @OA\Property(property="message", type="string", example="Course updated successfully"),
+     *       @OA\Property(property="course", ref="#/components/schemas/Course")
+     *     )
+     *   ),
+     *   @OA\Response(response=401, description="Unauthorized"),
+     *   @OA\Response(response=403, description="Only admins can update courses"),
+     *   @OA\Response(response=422, description="Validation error")
+     * )
+     */
     public function update(Request $request, Course $course)
     {
         if (!Auth::check()) {
@@ -149,6 +285,25 @@ class CourseController extends Controller
         ]);
     }
 
+    /**
+     * @OA\Delete(
+     *   path="/api/courses/{course}",
+     *   tags={"Courses"},
+     *   summary="Delete a course (admin only)",
+     *   security={{"sanctum":{}}},
+     *   @OA\Parameter(name="course", in="path", required=true, @OA\Schema(type="integer")),
+     *   @OA\Response(
+     *     response=200,
+     *     description="Deleted",
+     *     @OA\JsonContent(
+     *       type="object",
+     *       @OA\Property(property="message", type="string", example="Course deleted successfully")
+     *     )
+     *   ),
+     *   @OA\Response(response=401, description="Unauthorized"),
+     *   @OA\Response(response=403, description="Only admins can delete courses")
+     * )
+     */
     public function destroy(Course $course)
     {
         if (!Auth::check()) {

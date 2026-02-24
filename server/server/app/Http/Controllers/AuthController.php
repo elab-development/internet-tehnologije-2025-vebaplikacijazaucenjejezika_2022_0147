@@ -8,6 +8,12 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
+/**
+ * @OA\Tag(
+ *   name="Auth",
+ *   description="Authentication endpoints (Laravel Sanctum)"
+ * )
+ */
 class AuthController extends Controller
 {
     /**
@@ -124,7 +130,7 @@ class AuthController extends Controller
      *   path="/api/me",
      *   tags={"Auth"},
      *   summary="Get currently authenticated user",
-     *   security={{"bearerAuth":{}}},
+     *   security={{"sanctum":{}}},
      *   @OA\Response(
      *     response=200,
      *     description="OK",
@@ -161,7 +167,7 @@ class AuthController extends Controller
      *   path="/api/logout",
      *   tags={"Auth"},
      *   summary="Logout (revoke all tokens)",
-     *   security={{"bearerAuth":{}}},
+     *   security={{"sanctum":{}}},
      *   @OA\Response(
      *     response=200,
      *     description="Logged out",
